@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI News - Aktuelle Nachrichten und Trends</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Sanftes Hellblau/Grau als Hintergrund */
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .news-button {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .news-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .news-button:active {
+            transform: translateY(0px) scale(1);
+        }
+        .category-title {
+            border-bottom: 2px solid #cbd5e1; /* Tailwind gray-300 */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem; /* Mehr Abstand unter den Titeln */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="hero-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-12 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                KI News & Ressourcen
+            </h1>
+            <p class="text-lg md:text-xl mb-8">
+                Ihre zentrale Anlaufstelle für aktuelle Nachrichten, Trends und Tools im Bereich Künstliche Intelligenz.
+            </p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section class="mb-16">
+            <h2 class="text-3xl font-semibold mb-8 text-gray-700 category-title">Nachrichten & Blogs</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="https://t3n.de/news/tag/kuenstliche-intelligenz/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    t3n – KI & Machine Learning News
+                </a>
+                <a href="https://www.googlewatchblog.de/themen/kuenstliche-intelligenz/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    GoogleWatchBlog – Google & KI
+                </a>
+                <a href="https://the-decoder.de/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    The Decoder – KI-Fachmagazin
+                </a>
+                <a href="https://stadt-bremerhaven.de/thema/kuenstliche-intelligenz/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    Caschys Blog – Technik & KI
+                </a>
+                <a href="https://www.heise.de/thema/ki-kuenstliche-intelligenz" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    heise online – KI-Update
+                </a>
+                 <a href="https://neuland.ai/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gradient-to-r from-sky-500 to-cyan-600 hover:from-sky-600 hover:to-cyan-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    Neuland.ai – KI-News & Trends
+                </a>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <h2 class="text-3xl font-semibold mb-8 text-gray-700 category-title">Weitere Empfehlungen</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="https://www.heise.de/mit/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    MIT Technology Review (dt.)
+                </a>
+                <a href="https://www.trendradar-ki.de/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    Trendradar-KI – News & Trends
+                </a>
+                <a href="https://katzlberger.ai/ki-news-websites/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    Katzlberger.ai – KI-News Übersicht
+                </a>
+                <a href="https://www.dream-bit.de/news-tools/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    Dream-bit – KI-Seiten & Tools
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-3xl font-semibold mb-8 text-gray-700 category-title">Plattformen, Forschung & Tools</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="https://www.futuretools.io/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-teal-600 hover:bg-teal-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    Future Tools – KI-Tools & News
+                </a>
+                <a href="https://huggingface.co/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    Hugging Face – KI-Modelle
+                </a>
+                <a href="https://openai.com/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-blue-700 hover:bg-blue-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    OpenAI – Forschung & Entwicklung
+                </a>
+                <a href="https://singularityhub.com/category/artificial-intelligence/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-indigo-700 hover:bg-indigo-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    SingularityHub – Zukunft & KI
+                </a>
+                <a href="https://venturebeat.com/category/ai/" target="_blank" rel="noopener noreferrer"
+                   class="news-button bg-red-700 hover:bg-red-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
+                    VentureBeat AI – News & Analysen
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; <span id="currentYear"></span> KI News Sammlung. Alle Rechte vorbehalten (soweit anwendbar).</p>
+            <p class="text-sm text-gray-400 mt-2">
+                Diese Seite dient als kuratierte Linksammlung. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+
+</body>
+</html>

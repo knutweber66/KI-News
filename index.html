@@ -1,148 +1,191 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI News - Aktuelle Nachrichten und Trends</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Sanftes Hellblau/Grau als Hintergrund */
-        }
-        .gradient-text {
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        .hero-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .news-button {
-            transition: all 0.3s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .news-button:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .news-button:active {
-            transform: translateY(0px) scale(1);
-        }
-        .category-title {
-            border-bottom: 2px solid #cbd5e1; /* Tailwind gray-300 */
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem; /* Mehr Abstand unter den Titeln */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KI-News Übersicht</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Custom styles for the Inter font and basic body setup */
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Ensure full height for proper centering if needed */
+      min-height: 100vh;
+    }
+    /* Hide scrollbar for a cleaner look, but allow scrolling */
+    body::-webkit-scrollbar {
+      display: none;
+    }
+    body {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+
+    /* Keyframes for a subtle fade-in animation for news cards */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Apply fade-in animation to news items */
+    .news-item {
+      animation: fadeIn 0.5s ease-out forwards;
+      /* Add a slight delay for each item to create a staggered effect */
+      opacity: 0; /* Start invisible */
+    }
+  </style>
 </head>
-<body class="text-gray-800">
+<body class="m-0 p-4 sm:p-8 bg-gray-50 text-gray-800">
 
-    <header class="hero-bg text-white shadow-lg">
-        <div class="container mx-auto px-6 py-12 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                KI News & Ressourcen
-            </h1>
-            <p class="text-lg md:text-xl mb-8">
-                Ihre zentrale Anlaufstelle für aktuelle Nachrichten, Trends und Tools im Bereich Künstliche Intelligenz.
-            </p>
-        </div>
-    </header>
+  <!-- Main heading for the news overview -->
+  <h1 class="text-center text-3xl sm:text-4xl font-bold mb-8 text-blue-600">🧠 Aktuelle KI-News</h1>
 
-    <main class="container mx-auto px-6 py-12">
+  <!-- Container for the news grid, initially showing a loading message -->
+  <div class="news-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto" id="news-container">
+    <!-- Initial loading message, will be replaced by news items or an error -->
+    <div class="col-span-full text-center text-gray-500 text-lg py-10" id="loading-message" aria-live="polite">Lade News…</div>
+  </div>
 
-        <section class="mb-16">
-            <h2 class="text-3xl font-semibold mb-8 text-gray-700 category-title">Nachrichten & Blogs</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="https://t3n.de/news/tag/kuenstliche-intelligenz/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    t3n – KI & Machine Learning News
+  <script>
+    // Array of RSS feed URLs to fetch news from
+    const feedUrls = [
+      { name: "The Decoder", url: "https://the-decoder.de/feed/" },
+      { name: "Heise AI", url: "https://www.heise.de/rss/heise-atom.xml" },
+      { name: "Google News KI", url: "https://news.google.com/rss/search?q=künstliche+intelligenz&hl=de&gl=DE&ceid=DE:de" }
+    ];
+
+    // Get the container element where news items will be displayed
+    const container = document.getElementById('news-container');
+    const loadingMessage = document.getElementById('loading-message');
+    let feedsLoading = 0; // Counter for currently loading feeds
+
+    /**
+     * Truncates a string to a specified length, ensuring it ends at a word boundary.
+     * Appends '...' if truncation occurs.
+     * @param {string} text - The input string.
+     * @param {number} maxLength - The maximum desired length.
+     * @returns {string} The truncated string.
+     */
+    function truncateText(text, maxLength) {
+      if (!text || text.length <= maxLength) {
+        return text;
+      }
+      // Remove HTML tags from the description
+      const cleanText = text.replace(/(<([^>]+)>)/gi, "");
+      if (cleanText.length <= maxLength) {
+        return cleanText;
+      }
+      let truncated = cleanText.slice(0, maxLength);
+      // Find the last space to break at a word boundary
+      const lastSpace = truncated.lastIndexOf(' ');
+      if (lastSpace > -1) {
+        truncated = truncated.slice(0, lastSpace);
+      }
+      return truncated + '...';
+    }
+
+    /**
+     * Fetches and displays news from a given RSS feed.
+     * @param {object} source - An object containing the name and URL of the RSS feed.
+     * @param {number} index - The index of the news item for staggered animation.
+     */
+    async function loadFeed(source, index) {
+      feedsLoading++;
+      // Construct the API URL for rss2json.com to convert RSS to JSON
+      const apiURL = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.url)}`;
+      try {
+        // Fetch data from the API
+        const res = await fetch(apiURL);
+        // Check if the response is OK (status 200-299)
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+
+        // Ensure data.items exists and is an array
+        if (!data.items || !Array.isArray(data.items)) {
+          console.warn(`No items found or invalid data structure for ${source.name}`, data);
+          // Add a message if no items are found for this specific feed
+          const noItemsDiv = document.createElement("div");
+          noItemsDiv.className = "news-item bg-white rounded-xl shadow-md overflow-hidden p-4 col-span-full";
+          noItemsDiv.innerHTML = `<div class="news-content">
+                                    <strong class="text-yellow-600">Keine News gefunden für ${source.name}</strong>
+                                    <p class="text-sm text-gray-600">Möglicherweise gibt es derzeit keine neuen Artikel oder die Quelle ist leer.</p>
+                                  </div>`;
+          container.appendChild(noItemsDiv);
+          return;
+        }
+
+        // Sort items by publication date in descending order (newest first)
+        data.items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+        // Iterate over each news item and create its HTML representation
+        data.items.forEach((item, itemIndex) => {
+          const div = document.createElement("div");
+          // Apply Tailwind classes for styling the news item card
+          div.className = "news-item bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:scale-105 hover:shadow-xl";
+          // Add staggered animation delay
+          div.style.animationDelay = `${(index * 0.1) + (itemIndex * 0.05)}s`;
+
+          // Determine the image URL, using a placeholder if none is available
+          // The onerror attribute provides a fallback image if the primary image fails to load
+          const imageUrl = item.thumbnail || item.enclosure?.link || item.media$content?.url || "https://placehold.co/600x400/E0E0E0/333333?text=Kein+Bild+verfügbar";
+
+          div.innerHTML = `
+            <img class="news-image w-full h-48 object-cover bg-gray-200 rounded-t-xl"
+                 src="${imageUrl}"
+                 alt="${item.title ? item.title : 'Vorschaubild'}"
+                 onerror="this.onerror=null;this.src='https://placehold.co/600x400/E0E0E0/333333?text=Kein+Bild+verfügbar';">
+            <div class="news-content p-4 flex flex-col gap-2 flex-grow">
+              <h2 class="m-0 text-lg font-semibold leading-tight">
+                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="no-underline text-blue-700 hover:underline">
+                  ${item.title}
                 </a>
-                <a href="https://www.googlewatchblog.de/themen/kuenstliche-intelligenz/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    GoogleWatchBlog – Google & KI
-                </a>
-                <a href="https://the-decoder.de/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    The Decoder – KI-Fachmagazin
-                </a>
-                <a href="https://stadt-bremerhaven.de/thema/kuenstliche-intelligenz/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    Caschys Blog – Technik & KI
-                </a>
-                <a href="https://www.heise.de/thema/ki-kuenstliche-intelligenz" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    heise online – KI-Update
-                </a>
-                 <a href="https://neuland.ai/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gradient-to-r from-sky-500 to-cyan-600 hover:from-sky-600 hover:to-cyan-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    Neuland.ai – KI-News & Trends
-                </a>
+              </h2>
+              <small class="text-xs text-gray-500">${new Date(item.pubDate).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' })} – <span class="font-medium text-gray-600">${source.name}</span></small>
+              <p class="text-sm text-gray-700 flex-grow overflow-hidden line-clamp-3">${truncateText(item.description, 180)}</p>
             </div>
-        </section>
+          `;
+          container.appendChild(div);
+        });
+      } catch (error) {
+        // Log errors and display an error message in the UI
+        console.error("Fehler beim Laden:", source.name, error);
+        const div = document.createElement("div");
+        div.className = "news-item bg-white rounded-xl shadow-md overflow-hidden p-4 col-span-full";
+        div.innerHTML = `<div class="news-content">
+                            <strong class="text-red-500">Fehler beim Laden von ${source.name}</strong>
+                            <p class="text-sm text-gray-600">Bitte versuchen Sie es später erneut oder überprüfen Sie die Quelle.</p>
+                          </div>`;
+        container.appendChild(div);
+      } finally {
+        feedsLoading--;
+        // Check if all feeds have finished loading
+        if (feedsLoading === 0) {
+          loadingMessage.remove(); // Remove the loading message
+          // If no news items were added at all, display a "no news" message
+          if (container.children.length === 0) {
+            const noNewsDiv = document.createElement("div");
+            noNewsDiv.className = "col-span-full text-center text-gray-500 text-lg py-10";
+            noNewsDiv.textContent = "Es konnten keine News geladen werden. Bitte versuchen Sie es später erneut.";
+            container.appendChild(noNewsDiv);
+          }
+        }
+      }
+    }
 
-        <section class="mb-16">
-            <h2 class="text-3xl font-semibold mb-8 text-gray-700 category-title">Weitere Empfehlungen</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="https://www.heise.de/mit/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    MIT Technology Review (dt.)
-                </a>
-                <a href="https://www.trendradar-ki.de/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    Trendradar-KI – News & Trends
-                </a>
-                <a href="https://katzlberger.ai/ki-news-websites/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    Katzlberger.ai – KI-News Übersicht
-                </a>
-                <a href="https://www.dream-bit.de/news-tools/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-gray-700 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    Dream-bit – KI-Seiten & Tools
-                </a>
-            </div>
-        </section>
-
-        <section>
-            <h2 class="text-3xl font-semibold mb-8 text-gray-700 category-title">Plattformen, Forschung & Tools</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="https://www.futuretools.io/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-teal-600 hover:bg-teal-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    Future Tools – KI-Tools & News
-                </a>
-                <a href="https://huggingface.co/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    Hugging Face – KI-Modelle
-                </a>
-                <a href="https://openai.com/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-blue-700 hover:bg-blue-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    OpenAI – Forschung & Entwicklung
-                </a>
-                <a href="https://singularityhub.com/category/artificial-intelligence/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-indigo-700 hover:bg-indigo-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    SingularityHub – Zukunft & KI
-                </a>
-                <a href="https://venturebeat.com/category/ai/" target="_blank" rel="noopener noreferrer"
-                   class="news-button bg-red-700 hover:bg-red-800 text-white font-medium py-4 px-6 rounded-lg text-center block">
-                    VentureBeat AI – News & Analysen
-                </a>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-gray-800 text-white mt-16 py-8">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; <span id="currentYear"></span> KI News Sammlung. Für die sehr netten Teilnehmer des KI Kurses vom 19. bis 23. Mai 2025</p>
-            <p class="text-sm text-gray-400 mt-2">
-                Diese Seite dient als kuratierte Linksammlung. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.
-            </p>
-        </div>
-    </footer>
-
-    <script>
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
-
+    // Immediately invoked asynchronous function to load all feeds
+    (async () => {
+      // Set initial loading message
+      loadingMessage.textContent = "Lade News…";
+      // Load each feed sequentially with an index for staggered animation
+      for (let i = 0; i < feedUrls.length; i++) {
+        await loadFeed(feedUrls[i], i);
+      }
+    })();
+  </script>
 </body>
 </html>
